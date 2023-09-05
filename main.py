@@ -7,6 +7,6 @@ if __name__ == '__main__':
     user_id = '...'
     reserved_photos = BackUp(vk_token, user_id, yandex_token)
     reserved_photos.upload()
-    print('Ваши 5 аватарок были успешно скопированы на Яндекс.Диск')
+    print('Ваши аватарки были успешно скопированы на Яндекс.Диск')
 
 

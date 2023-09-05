@@ -1,5 +1,6 @@
 import requests
 import json
+from datetime import datetime
 
 class BackUp:
     def __init__(self, access_token, user_id, ya_token, version='5.131'):
@@ -30,18 +31,26 @@ class BackUp:
         requests.put(url, headers=headers)
         return folder_name
     
-    def download(self, count = 5):
+    def download(self):
         photos_data = self.get_photos()
-        photos = photos_data['response']['items'][:count]
+        photos = photos_data['response']['items']
         photo_info = []
+        likes_count_dict = {}
 
-        for photo in photos:
+        for index, photo in enumerate(photos):
             likes = photo['likes']['count']
             photo_size = photo['sizes'][-1]['type']
             photo_url = photo['sizes'][-1]['url']
-            response = requests.get(photo_url)
-            if 200 <= response.status_code < 300:
+
+            if likes in likes_count_dict:
+                date_uploaded = datetime.utcfromtimestamp(photo['date']).strftime('%Y-%m-%d')
+                filename = f'{likes}_{date_uploaded}.jpg'
+            else:
                 filename = f'{likes}.jpg'
+            
+            response = requests.get(photo_url)
+
+            if 200 <= response.status_code < 300:
                 with open(filename, 'wb') as file:
                     file.write(response.content)
                 
@@ -49,10 +58,12 @@ class BackUp:
                     "file_name": filename,
                     "size": photo_size
                 })
+            likes_count_dict[likes] = likes
 
         with open('info.json', 'wt') as json_file:
             json.dump(photo_info, json_file, indent=4)
         
+
         return photo_info 
 
     def upload(self):
