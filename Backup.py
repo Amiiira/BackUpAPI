@@ -81,6 +81,8 @@ class BackUp:
                         print(f"Ошибка при загрузки файла {filename} (ошибка: {upload_response.status_code})")
                 else:
                     print("Ошибка при получении URL Яндекс.Диска")
+            elif response.status_code == 409:
+                print('Ошибка: файл уже существует в папке')
             else:
                 print('Ошибка:', response.status_code)
 
@@ -90,6 +92,11 @@ class BackUp:
             })
 
             likes_count_dict[likes] = likes
+        output_file = 'photo_info.json'  # Имя файла для сохранения информации
+        with open(output_file, 'w') as json_file:
+            json.dump(photo_info, json_file, indent=4)
+
+        print(f'Информация о файлах сохранена в {output_file}')
 
 
             
